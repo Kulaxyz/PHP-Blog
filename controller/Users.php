@@ -5,6 +5,9 @@ use model\UsersModel;
 use core\DB;
 use core\DBDriver;
 use core\Validator;
+use core\UserHelp;
+use core\Exceptions\ValidationException;
+
 class Users extends Base
 {
 	private $request;
@@ -14,97 +17,82 @@ class Users extends Base
 		$this->request = $request;
 	}
 
-	public function registerAction()
-	{
+	public function signUpAction()
+	{	
 		$model = new UsersModel(new DBDriver(DB::connect()), new Validator());
-		if($this->request->isPost()) {
-			$login = trim(sprintf('%s', $this->request->post('login')));
-			$username = trim(sprintf('%s', $this->request->post('username')));
-			$passwd = trim(sprintf('%s', $this->request->post('password')));
-			$passwd2 = trim(sprintf('%s', $this->request->post('password2')));
-			$user = $model->getOne($login);
-			if($passwd2 != $passwd) {
-				$msg = 'Пароли не совпадают';
-			}
-			elseif(!empty($user)) {
-				$msg = 'Пользователь с таким логином уже существует.';
-			}
-			elseif(strlen($login) < 3) {
-				$msg = 'Логин должен содержать хотя бы 3 символа.';
-			}
-			elseif(strlen($username) < 3) {
-				$msg = 'Имя должен содержать хотя бы 3 символа.';
-			}
-			elseif(strlen($passwd) < 7) {
-				$msg = 'Придумайте посложнее пароль.';
-			}
-			else {
-				$password = hash('sha256', $passwd);
-				$params =  [
-					'login' => $login,
-					'username' => $username,
-					'password' => $password
-					];
-				$model->addOne($params);
-				header('Location:' . ROOT . 'Users/login');
-			}
+
+		if (!$model) {
+			throw new ModelException();	
 		}
-		else {
-			$login = '';
-			$username = '';
-			$msg = '';
+
+		$help = new UserHelp($model);
+
+		if (!$help) {
+			throw new ModelException();	
 		}
-		return $this->build('register', ['login' => $login, 'username' => $username, 'msg' => $msg]);
+
+		if ($this->request->isPost()) {
+			$params = $this->request->post();
+			try {
+				$help->signUp($params);
+				header('Location:' . ROOT . 'Users/sign-in');
+			} catch (ValidationException $e) {
+				$errors = $e->getErrors();
+			}
+		} else {
+			$errors = '';
+			$params = [];
+		}
+
+		$this->content = $this->build('sign-up', [
+										'params' => $params,
+										'errors' => $errors
+										]
+							);
 	}
 
-	public function loginAction()
+	public function signInAction()
 	{
 		$model = new UsersModel(new DBDriver(DB::connect()), new Validator());
-		if($this->request->isPost()) {
-			$login = trim(sprintf('%s', $this->request->post('login')));
-			$passwd = trim(sprintf('%s', $this->request->post('password')));
-			$user = $model->getOne($login);
-			if(empty($user)) {
-				$msg = 'Пользователь с таким логином не найден.';
-			}
-			else {
-				$password = hash('sha256', $passwd);
-				if($password == $user['password']) {
-					$_SESSION['isAuth'] = true;
-					if($this->request->post('remember') !== null) {
-						setcookie('login', $login, time() + 3600 * 24 * 365 * 10, '/');
-						setcookie('password', $password, time() + 3600 * 24 * 365 * 10, '/');
-					}
-					header('Location:' . ROOT . 'Articles');
-				}
-				else {
-					$msg = 'Неправильный пароль';
-				}
+
+		if (!$model) {
+			throw new ModelException();	
+		}
+
+		$help = new UserHelp($model);
+
+		if (!$help) {
+			throw new ModelException();	
+		}
+
+		if ($this->request->isPost()) {
+			$params = $this->request->post();
+			try {
+				$help->signIn($params);
+				header('Location:' . ROOT . 'Articles');
+			} catch (ValidationException $e) {
+				$errors = $e->getErrors();
 			}
 		}
 		else {
-			$login = '';
-			$msg = '';
+			$params = [];
+			$errors = '';
 		}
-		$this->content = $this->build('login', ['login' => $login, 'msg' => $msg]);	
+
+		$this->content = $this->build('sign-in', 
+												[
+												'params' => $params,
+												'errors' => $errors
+												]
+									  );	
 	}
 
 	public function exitAction()
 	{
-		$model = new UsersModel(new DBDriver(DB::connect()), new Validator());
 		$_SESSION['isAuth'] = false;
-		setcookie('login', $login, time() - 3600 * 24 * 365 * 10, '/');
-		setcookie('password', $password, time() - 3600 * 24 * 365 * 10, '/');
+		setcookie('login', '', time() - 3600 * 24 * 365 * 10, '/');
+		setcookie('password', '', time() - 3600 * 24 * 365 * 10, '/');
 		header('Location:' . ROOT . 'Articles');
 	}
-
-	// public function deleteAction()
-	// {
-	// 	$model = new UsersModel(new DBDriver(DB::connect()));
-	// 	$id = $this->session('id') !== null && is_numeric($this->session('id')) ? $this->session('id') : null;
-	// 	$model->deleteOne($id);
-	// 	header('Location:' . ROOT . 'Articles');
-
-	// }
 }
 ?>

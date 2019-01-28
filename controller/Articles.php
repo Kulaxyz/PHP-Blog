@@ -58,21 +58,13 @@ class Articles extends Base
 			throw new AuthException();	
 		} else {
 			if($this->request->isPost()){
-				$title = trim(sprintf('%s', $this->request->post('title')));
-				$content = trim(sprintf("%s", $this->request->post('content')));
-				$author = trim(sprintf('%s', $this->request->post('author')));
-				$params = [
-							'title' => $title,
-					 	 	'content' => $content,
-					 		'author' => $author,
-					 	  ];
+				$params = $this->request->post();
 				$model = new ArticlesModel(
 											new DBDriver(DB::connect()),
 											new Validator()
 				  						  );
 				if (!$model) {
-					throw new ModelException();
-					
+					throw new ModelException();		
 				}				
 				try {
 					$id = $model->addOne($params);
@@ -81,19 +73,13 @@ class Articles extends Base
 				} catch (ValidationException $e) {
 					$errors = $e->getErrors();
 				}
-			}
-			else {
-				$title = '';
-				$content = '';
-				$author = '';
+			} else {
+				$params = [];
 				$errors = '';
-
 			}
 
 			$this->content =  $this->build('add',  [
-													'title' => $title,
-													'content' => $content,
-													'author' => $author,
+													'params' => $params,
 													'errors' => $errors
 													]
 											);
@@ -133,18 +119,13 @@ class Articles extends Base
 										new DBDriver(DB::connect()),
 										new Validator()
 									   );
+
 			if (!$model) {
-				throw new ModelException();
-				
+				throw new ModelException();	
 			}
-			if ($this->request->isPost()) {
-				$title = sprintf('%s', $this->request->post('title'));
-				$content = sprintf("%s", $this->request->post('content'));
-				$author = sprintf('%s', $this->request->post('author'));
-				$params = ['title' => $title,
-				 			'content' => $content,
-				 			'author' => $author
-				 		   ];
+
+			if ($this->request->isPost()) {	
+				$params = $this->request->post();
 				$where = ['id' => $id];
 				try {
 					$model->editOne($params, $where);
@@ -153,23 +134,18 @@ class Articles extends Base
 				} catch (ValidationException $e) {
 					$errors = $e->getErrors();
 				}		
-			}
-			else {
+			} else {
 				$article = $model->getById($id);
 
 				if (!$article) {
 					throw new NotFoundException('Такой статьи не найдено.');
 				}
 
-				$title = $article['title'];
-				$content = $article['content'];
-				$author = $article['author'];
 				$errors = '';
+				$params = $article;
 			}
 			$this->content = $this->build('edit',  [
-													'title' => $title,
-													'content' => $content,
-													'author' => $author,
+													'params' => $params,
 													'errors' => $errors
 													]
 											);

@@ -21,8 +21,8 @@ if($isAuth): ?>
 <?php
 
 else: ?>
-<a href="<?=ROOT?>Users/login">Войти <br></a>
-<a href="<?=ROOT?>Users/register">Зарегистрироваться <br></a>
+<a href="<?=ROOT?>Users/sign-in">Войти <br></a>
+<a href="<?=ROOT?>Users/sign-up">Зарегистрироваться <br></a>
 <?php
 
 endif;

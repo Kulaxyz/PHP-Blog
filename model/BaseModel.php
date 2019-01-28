@@ -27,20 +27,29 @@ class BaseModel
 		return $this->db->select($this->table, ['id' => $id], DBDriver::FETCH_ONE);
 	}
 
+	public function getOne($login)
+	{
+		$params = ['login' => $login];
+		return $this->db->select($this->table, $params, DBDriver::FETCH_ONE);
+	}
+
 	public function deleteOne($id)
 	{
 		$params = ['id' => $id];
 		$this->db->delete($this->table, $params);
 	}
 
-	public function addOne($params)
+	public function addOne($params, $needValidation = true)
 	{
-		$this->validator->execute($params);
-		if(!$this->validator->success) {
-			throw new ValidationException($this->validator->errors, 500);
-		} else {
-		return $this->db->insert($this->table, $params);
+		if ($needValidation) {
+			$this->validator->execute($params);
+			if (!$this->validator->success) {
+				throw new ValidationException($this->validator->errors, 500);
+			}
 		}
+
+		return $this->db->insert($this->table, $params);
+
 	}
 
 	public function editOne($params, $where)

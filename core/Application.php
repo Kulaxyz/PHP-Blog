@@ -65,11 +65,11 @@ class Application
 			}
 		} elseif ($controller == 'Users') {
 			switch ($action) {
-				case 'login':
-					$action = 'login';
+				case 'sign-in':
+					$action = 'signIn';
 					break;
-				case 'register':
-					$action = 'register';
+				case 'sign-up':
+					$action = 'signUp';
 					break;
 				case 'exit':
 					$action = 'exit';

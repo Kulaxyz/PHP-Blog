@@ -16,7 +16,11 @@
 
 		public function getErrors()
 		{
-			return sprintf('<br>%s', implode('<br>', $this->errors));
+			if (is_array($this->errors)) {
+				return sprintf('<br>%s', implode('<br>', $this->errors));
+			} else {
+				return $this->errors;
+			}
 		}
 	}
 ?>
