@@ -1,0 +1,19 @@
+{
+    "name": "kulaxyz/blog",
+    "description": "Trainee blog",
+    "authors": [
+        {
+            "name": "Kulaxyz",
+            "email": "kulaxyz13@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "1g0rbm/handybox": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kulaxyz\\Blog\\": "src/"
+        }
+    }
+}

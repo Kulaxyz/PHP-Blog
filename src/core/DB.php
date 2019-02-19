@@ -1,5 +1,5 @@
 <?php
-namespace core;
+namespace Kulaxyz\Blog\core;
 class DB
 {
 	public static function connect()

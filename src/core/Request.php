@@ -1,6 +1,6 @@
 <?php
 
-namespace core;
+namespace Kulaxyz\Blog\core;
 
 class Request
 {

@@ -1,5 +1,5 @@
 <?php
-namespace controller;
+namespace Kulaxyz\Blog\controller;
 class Base
 {
 	protected $content;

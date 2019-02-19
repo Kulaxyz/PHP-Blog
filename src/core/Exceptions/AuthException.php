@@ -1,5 +1,5 @@
 <?php 
-namespace core\Exceptions;
+namespace Kulaxyz\Blog\core\Exceptions;
 
 /**
  * 

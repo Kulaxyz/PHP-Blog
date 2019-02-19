@@ -1,7 +1,9 @@
 <?php
-namespace model;
-use core\DBDriver;
-use core\Validator;
+namespace Kulaxyz\Blog\model;
+
+use Kulaxyz\Blog\core\DBDriver;
+use Kulaxyz\Blog\model\BaseModel;
+use Kulaxyz\Blog\core\Validator;
 
 class ArticlesModel extends BaseModel
 {
